@@ -6,6 +6,8 @@ import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
 import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
 import org.mapstruct.Mapper;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface AnswerMapper {
 
@@ -14,4 +16,6 @@ public interface AnswerMapper {
     ParentAnswerResponse toParentAnswerResponse(Answer answer);
 
     AnswerResponse toAnswerResponse(Answer answer);
+
+    List<ParentAnswerResponse> toAnswerResponseList(List<Answer> answers);
 }

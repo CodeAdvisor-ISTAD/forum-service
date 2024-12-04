@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/answers")
 @RequiredArgsConstructor
@@ -27,4 +29,18 @@ public class AnswerController {
         return answerService.findAnswerByUuid(answerUuid);
     }
 
+    @GetMapping("/{questionUuid}/question")
+    public List<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionUuid) {
+        return answerService.findAllQuestionByQuestionUuid(questionUuid);
+    }
+
+    @DeleteMapping("/{answerUuid}/soft-delete")
+    public BaseResponse<?> deleteAnswer(@PathVariable String answerUuid) {
+        return answerService.deleteAnswer(answerUuid, null);
+    }
+
+    @PutMapping("/{answerUuid}/{authorUuid}/accepted")
+    public BaseResponse<?> acceptAnswer(@PathVariable String answerUuid, @PathVariable String authorUuid) {
+        return answerService.acceptAnswer(answerUuid, authorUuid);
+    }
 }

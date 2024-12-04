@@ -33,8 +33,10 @@ public class Answer extends Auditable {
 
     private Boolean isDrafted = false;
 
-    @ManyToOne
-    private Vote vote;
+    private Boolean isParent = true;
+
+    @OneToMany(mappedBy = "answer")
+    private List<Vote> vote;
 
     @ManyToOne
     private Question question;

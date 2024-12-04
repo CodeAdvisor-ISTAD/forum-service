@@ -45,8 +45,8 @@ public class Question extends Auditable {
 
     private Boolean isDrafted = false;
 
-    @ManyToOne
-    private Vote vote;
+    @OneToMany(mappedBy = "question")
+    private List<Vote> vote;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(

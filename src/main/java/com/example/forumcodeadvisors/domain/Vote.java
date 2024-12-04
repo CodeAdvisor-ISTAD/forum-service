@@ -22,7 +22,7 @@ public class Vote {
 
     private Boolean isUpvote;
 
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     private String userUuid;
 

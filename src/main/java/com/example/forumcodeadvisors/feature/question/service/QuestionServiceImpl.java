@@ -35,7 +35,7 @@ public class QuestionServiceImpl implements QuestionService {
      * Create forum content
      *
      * @param createQuestionRequest
-     * @return void
+     * @return BaseResponse
      * by Yith Sopheaktra
      */
     @Transactional
@@ -61,6 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         // set UUID to question
         question.setUuid(UUID.randomUUID().toString());
+        question.setVote(List.of());
 
         questionRepository.save(question);
 
@@ -76,7 +77,7 @@ public class QuestionServiceImpl implements QuestionService {
      * Publish question
      *
      * @param questionUuid
-     * @return void
+     * @return BaseResponse
      * by Yith Sopheaktra
      */
     @Override
@@ -119,7 +120,7 @@ public class QuestionServiceImpl implements QuestionService {
      * Delete question
      *
      * @param questionUuid
-     * @return void
+     * @return BaseResponse
      * by Yith Sopheaktra
      */
     @Override
@@ -143,7 +144,7 @@ public class QuestionServiceImpl implements QuestionService {
      * Archive question
      *
      * @param questionUuid
-     * @return void
+     * @return BaseResponse
      * by Yith Sopheaktra
      */
     @Override

@@ -8,11 +8,11 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "forum_tag")
+@Table(name = "votes")
+@NoArgsConstructor
 @Setter
 @Getter
-@NoArgsConstructor
-public class ForumTag {
+public class Vote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,10 +20,15 @@ public class ForumTag {
 
     private String uuid;
 
-    private String name;
+    private Boolean isUpvote;
 
-    @ManyToMany
-    private List<ForumContent> contents;
+    private Boolean isDeleted;
 
+    private String userUuid;
 
+    @ManyToOne
+    private Question question;
+
+    @ManyToOne
+    private Answer answer;
 }

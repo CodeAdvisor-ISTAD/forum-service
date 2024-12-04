@@ -9,35 +9,37 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "forum_content")
+@Table(name = "answer")
 @Setter
 @Getter
 @NoArgsConstructor
-public class ForumContent extends Auditable {
-
+public class Answer extends Auditable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String uuid;
 
-    private String title;
+    private String slug;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private String authorId;
+    private String authorUuid;
 
-    private String interactionId;
+    private Boolean isAccepted = false;
 
-    @ManyToMany
-    @JoinTable(
-            name = "forum_content_tag",
-            joinColumns = @JoinColumn(name = "forum_content_id"),
-            inverseJoinColumns = @JoinColumn(name = "forum_tag_id")
-    )
-    private List<ForumTag> tags;
+    private Boolean isDeleted = false;
 
+    private Boolean isDrafted = false;
 
+    @ManyToOne
+    private Vote vote;
+
+    @ManyToOne
+    private Question question;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Answer> replies;
 
 }

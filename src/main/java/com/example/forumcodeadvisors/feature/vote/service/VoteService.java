@@ -7,5 +7,7 @@ public interface VoteService {
 
     BaseResponse<?> voteQuestion(String questionUuid, String userUuid);
 
+    Integer totalQuestionVotes(String questionUuid);
+
 
 }

@@ -8,5 +8,9 @@ import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, Long> {
 
-    Optional<Vote> findByQuestionAndUserUuid(Question question, String userUuid);
+    Vote findByUserUuid(String userUuid);
+
+    Boolean existsByQuestionUuidAndUserUuid(String questionUuid, String userUuid);
+
+    Integer countByQuestion(Question question);
 }

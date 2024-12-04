@@ -45,10 +45,10 @@ public class Question extends Auditable {
 
     private Boolean isDrafted = false;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany
     private List<Vote> vote;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(
             name = "question_tag",
             joinColumns = @JoinColumn(name = "question_id"),

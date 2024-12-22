@@ -6,6 +6,7 @@ import com.example.forumcodeadvisors.feature.question.dto.QuestionResponse;
 import com.example.forumcodeadvisors.feature.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +25,9 @@ public class QuestionController {
         return questionService.createQuestion(createQuestionRequest);
     }
 
-    @PostMapping("/{questionUuid}/publish")
-    public BaseResponse<?> publishQuestion(@PathVariable String questionUuid) {
-        return questionService.publishQuestion(questionUuid);
+    @PostMapping("/publish")
+    public BaseResponse<?> publishQuestion(@RequestParam String questionUuid, @RequestParam String userUuid) {
+        return questionService.publishQuestion(questionUuid, userUuid);
     }
 
     @DeleteMapping("/{questionUuid}/soft-delete")
@@ -45,8 +46,15 @@ public class QuestionController {
     }
 
     @GetMapping
-    public List<QuestionResponse> findAllQuestions() {
-        return questionService.findAllQuestions();
+    public Page<QuestionResponse> findAllQuestions(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
+        return questionService.findAllQuestions(page, size);
+    }
+
+    @GetMapping("/archived")
+    public Page<QuestionResponse> findAllUnArchivedQuestions(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "10") int size) {
+        return questionService.findAllUnArchivedQuestions(page, size);
     }
 
     @GetMapping("/{questionUuid}")

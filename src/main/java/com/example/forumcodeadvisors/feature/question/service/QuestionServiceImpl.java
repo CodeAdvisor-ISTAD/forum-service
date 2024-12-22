@@ -11,6 +11,9 @@ import com.example.forumcodeadvisors.feature.tag.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -81,12 +84,18 @@ public class QuestionServiceImpl implements QuestionService {
      * by Yith Sopheaktra
      */
     @Override
-    public BaseResponse<?> publishQuestion(String questionUuid) {
+    public BaseResponse<?> publishQuestion(String questionUuid, String userUuid) {
 
         // find question by UUID
         Question question = questionRepository.findByUuid(questionUuid)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Question not found"));
+
+        // check if user is qualified to publish question
+        if(!question.getAuthorUuid().equals(userUuid)){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "You are not qualified to publish this question");
+        }
 
         // check if question is archived
         if(question.getIsArchived()){
@@ -185,11 +194,21 @@ public class QuestionServiceImpl implements QuestionService {
      * by Yith Sopheaktra
      */
     @Override
-    public List<QuestionResponse> findAllQuestions() {
+    public Page<QuestionResponse> findAllQuestions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
 
-        List<Question> questions = questionRepository.findAllByIsArchivedAndIsDeletedAndIsDrafted(false, false, false);
+        Page<Question> questions = questionRepository.findAllByIsArchivedAndIsDeletedAndIsDrafted(false, false, false, pageable);
 
-        return questionMapper.toQuestionResponse(questions);
+        return questions.map(questionMapper::toQuestionResponse);
+    }
+
+    @Override
+    public Page<QuestionResponse> findAllUnArchivedQuestions(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Question> questions = questionRepository.findAllByIsArchivedAndIsDeletedAndIsDrafted(true, false, false, pageable);
+
+        return questions.map(questionMapper::toQuestionResponse);
     }
 
 

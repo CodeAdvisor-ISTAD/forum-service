@@ -1,8 +1,10 @@
 package com.example.forumcodeadvisors.feature.question.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
+import com.example.forumcodeadvisors.domain.Question;
 import com.example.forumcodeadvisors.feature.question.dto.CreateQuestionRequest;
 import com.example.forumcodeadvisors.feature.question.dto.QuestionResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +14,7 @@ public interface QuestionService {
 
     BaseResponse<?> createQuestion(CreateQuestionRequest createForumRequest);
 
-    BaseResponse<?> publishQuestion(String questionUuid);
+    BaseResponse<?> publishQuestion(String questionUuid, String userUuid);
 
     BaseResponse<?> deleteQuestion(String questionUuid);
 
@@ -20,7 +22,9 @@ public interface QuestionService {
 
     BaseResponse<?> unarchiveQuestion(String questionUuid);
 
-    List<QuestionResponse> findAllQuestions();
+    Page<QuestionResponse> findAllQuestions(int page, int size);
+
+    Page<QuestionResponse> findAllUnArchivedQuestions(int page, int size);
 
     QuestionResponse findQuestionByUuid(String questionUuid);
 

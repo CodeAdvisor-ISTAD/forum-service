@@ -3,9 +3,9 @@ spring:
     name: forum-code-advisors
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/postgres
-    username: postgres
-    password: qwer
+    url: jdbc:postgresql://34.50.73.18:5430/postgres
+    username: admin
+    password: Code@Advisors2024
   jpa:
     hibernate:
       ddl-auto: create-drop

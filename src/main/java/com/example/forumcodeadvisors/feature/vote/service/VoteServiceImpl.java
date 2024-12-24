@@ -59,10 +59,20 @@ public class VoteServiceImpl implements VoteService{
         // check if user has already voted
         for (Vote vote : votes) {
             if (vote.getUserUuid().equals(userUuid)) {
-                throw new ResponseStatusException(
-                        CONFLICT,
-                        "User has already voted"
-                );
+                if(vote.getIsUpvote()) {
+                    throw new ResponseStatusException(
+                            CONFLICT,
+                            "User has already voted"
+                    );
+                }else {
+                    vote.setIsUpvote(true);
+                    voteRepository.save(vote);
+                    return BaseResponse
+                            .builder()
+                            .code(HttpStatus.OK.value())
+                            .message("Vote successful")
+                            .build();
+                }
             }
         }
 
@@ -75,7 +85,7 @@ public class VoteServiceImpl implements VoteService{
 
         return BaseResponse
                 .builder()
-                .code(HttpStatus.CREATED.value())
+                .code(HttpStatus.OK.value())
                 .message("Vote successful")
                 .build();
     }
@@ -120,7 +130,7 @@ public class VoteServiceImpl implements VoteService{
         }
 
         // check if answer is null
-        Answer answer = answerRepository.findByUuid(answerUuid)
+        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid,false)
                 .orElseThrow(() -> new ResponseStatusException(
                         BAD_REQUEST,
                         "Answer not found"
@@ -131,10 +141,20 @@ public class VoteServiceImpl implements VoteService{
         // check if user has already voted
         for (Vote vote : votes) {
             if (vote.getUserUuid().equals(userUuid)) {
-                throw new ResponseStatusException(
-                        CONFLICT,
-                        "User has already voted"
-                );
+                if (vote.getIsUpvote()) {
+                    throw new ResponseStatusException(
+                            CONFLICT,
+                            "User has already voted"
+                    );
+                }else {
+                    vote.setIsUpvote(true);
+                    voteRepository.save(vote);
+                    return BaseResponse
+                            .builder()
+                            .code(HttpStatus.OK.value())
+                            .message("Vote successful")
+                            .build();
+                }
             }
         }
 
@@ -146,6 +166,180 @@ public class VoteServiceImpl implements VoteService{
         vote.setIsUpvote(true);
         voteRepository.save(vote);
 
-        return null;
+        return BaseResponse
+                .builder()
+                .code(HttpStatus.OK.value())
+                .message("Vote successful")
+                .build();
     }
+
+    /**
+     * Get total votes for an answer
+     * @param answerUuid
+     * @return TotalVoteResponse
+     */
+    @Override
+    public TotalVoteResponse totalAnswerVotes(String answerUuid) {
+        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid,false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Answer not found"
+                ));
+
+        List<Vote> upVote = voteRepository.findByAnswerAndIsUpvote(answer, true);
+
+        return TotalVoteResponse
+                .builder()
+                .totalVotes(upVote.size())
+                .build();
+    }
+
+    /**
+     * Downvote a question
+     * @param questionUuid
+     * @param userUuid
+     * @return BaseResponse<?>
+     */
+    @Override
+    public BaseResponse<?> downVoteQuestion(String questionUuid, String userUuid) {
+
+        Question question = questionRepository.findByUuid(questionUuid)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Question not found"
+                ));
+
+        List<Vote> votes = question.getVote();
+        votes.forEach(vote -> {
+            if (vote.getUserUuid().equals(userUuid)) {
+                if (vote.getIsUpvote()) {
+                    vote.setIsUpvote(false);
+                    voteRepository.save(vote);
+                }else {
+                    throw new ResponseStatusException(
+                            BAD_REQUEST,
+                            "User has not voted"
+                    );
+                }
+            }
+        });
+
+        return BaseResponse
+                .builder()
+                .code(HttpStatus.OK.value())
+                .message("Downvote successful")
+                .build();
+
+    }
+
+    /**
+     * Downvote an answer
+     * @param answerUuid
+     * @param userUuid
+     * @return BaseResponse<?>
+     */
+    @Override
+    public BaseResponse<?> downVoteAnswer(String answerUuid, String userUuid) {
+
+        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid,false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Answer not found"
+                ));
+
+        List<Vote> votes = answer.getVote();
+        votes.forEach(vote -> {
+            if (vote.getUserUuid().equals(userUuid)) {
+                if (vote.getIsUpvote()) {
+                    vote.setIsUpvote(false);
+                    voteRepository.save(vote);
+                }else {
+                    throw new ResponseStatusException(
+                            BAD_REQUEST,
+                            "User has not voted"
+                    );
+                }
+            }
+
+        });
+
+        return BaseResponse
+                .builder()
+                .code(HttpStatus.OK.value())
+                .message("Downvote successful")
+                .build();
+
+    }
+
+    /**
+     * Check if user has voted on a question
+     * @param questionUuid
+     * @param userUuid
+     * @return BaseResponse<?>
+     */
+    @Override
+    public BaseResponse<?> checkUserIsVotedOnQuestion(String questionUuid, String userUuid) {
+        Question question = questionRepository.findByUuid(questionUuid)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Question not found"
+                ));
+
+        List<Vote> votes = question.getVote();
+
+        for (Vote vote : votes) {
+            if (vote.getUserUuid().equals(userUuid)) {
+                if(vote.getIsUpvote()) {
+                    return BaseResponse
+                            .builder()
+                            .code(HttpStatus.OK.value())
+                            .message("User has already voted")
+                            .build();
+                }
+            }
+        }
+
+        return BaseResponse
+                .builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .message("User has not voted")
+                .build();
+    }
+
+    /**
+     * Check if user has voted on an answer
+     * @param answerUuid
+     * @param userUuid
+     * @return BaseResponse<?>
+     */
+    @Override
+    public BaseResponse<?> checkUserIsVotedOnAnswer(String answerUuid, String userUuid) {
+        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid,false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Answer not found"
+                ));
+
+        List<Vote> votes = answer.getVote();
+
+        for (Vote vote : votes) {
+            if (vote.getUserUuid().equals(userUuid)) {
+                if(vote.getIsUpvote()) {
+                    return BaseResponse
+                            .builder()
+                            .code(HttpStatus.OK.value())
+                            .message("User has already voted")
+                            .build();
+                }
+            }
+        }
+
+        return BaseResponse
+                .builder()
+                .code(HttpStatus.NOT_FOUND.value())
+                .message("User has not voted")
+                .build();
+    }
+
+
 }

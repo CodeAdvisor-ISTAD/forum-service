@@ -12,4 +12,13 @@ public interface VoteService {
 
     BaseResponse<?> voteAnswer(String answerUuid, String userUuid);
 
+    TotalVoteResponse totalAnswerVotes(String answerUuid);
+
+    BaseResponse<?> downVoteQuestion(String questionUuid, String userUuid);
+
+    BaseResponse<?> downVoteAnswer(String answerUuid, String userUuid);
+
+    BaseResponse<?> checkUserIsVotedOnQuestion(String questionUuid, String userUuid);
+
+    BaseResponse<?> checkUserIsVotedOnAnswer(String answerUuid, String userUuid);
 }

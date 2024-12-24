@@ -19,5 +19,4 @@ public interface AnswerRepository extends JpaRepository<Answer,Long> {
 
     Page<Answer> findAllByQuestionAndIsDeletedAndIsParent(Question question, Boolean isDeleted, Pageable pageable, Boolean isParent);
 
-
 }

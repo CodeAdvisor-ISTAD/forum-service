@@ -9,6 +9,8 @@ import com.example.forumcodeadvisors.feature.answer.mapper.AnswerMapper;
 import com.example.forumcodeadvisors.feature.answer.repository.AnswerRepository;
 import com.example.forumcodeadvisors.feature.question.repository.QuestionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -52,7 +54,6 @@ public class AnswerServiceImpl implements AnswerService {
             parentAnswer.setReplies(List.of());
             parentAnswer.setIsParent(true);
             answerRepository.save(parentAnswer);
-
         } else { // if answerUuid is not null ( This mean this is a reply )
             // get the parent answer
             parentAnswer = answerRepository.findByUuidAndIsDeleted(createAnswerRequest.answerUuid(), false)
@@ -113,19 +114,21 @@ public class AnswerServiceImpl implements AnswerService {
      * by Yith Sopheaktra
      */
     @Override
-    public List<ParentAnswerResponse> findAllQuestionByQuestionUuid(String questionUuid) {
+    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(String questionUuid, int page, int size) {
 
-        List<Answer> answers = answerRepository.findAllByQuestionAndIsParentAndIsDeleted(
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+
+        Page<Answer> answers = answerRepository.findAllByQuestionAndIsDeletedAndIsParent(
                 questionRepository.findByUuid(questionUuid).orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Question not found"
                 )),
-                true,
-                false
+                false,
+                pageable,
+                true
         );
-        return answerMapper.toAnswerResponseList(answers);
+        return answers.map(answerMapper::toParentAnswerResponse);
     }
-
 
     /**
      * Delete an answer

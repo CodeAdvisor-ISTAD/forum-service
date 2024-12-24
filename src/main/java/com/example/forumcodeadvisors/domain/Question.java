@@ -45,7 +45,7 @@ public class Question extends Auditable {
 
     private Boolean isDrafted = false;
 
-    @OneToMany
+    @OneToMany(mappedBy = "question")
     private List<Vote> vote;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

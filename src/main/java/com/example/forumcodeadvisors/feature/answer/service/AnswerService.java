@@ -3,6 +3,7 @@ package com.example.forumcodeadvisors.feature.answer.service;
 import com.example.forumcodeadvisors.base.BaseResponse;
 import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
 import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface AnswerService {
 
     ParentAnswerResponse findAnswerByUuid(String answerUuid);
 
-    List<ParentAnswerResponse> findAllQuestionByQuestionUuid(String questionUuid);
+    Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(String questionUuid, int page, int size);
 
     BaseResponse<?> deleteAnswer(String answerUuid, String authorUuid);
 

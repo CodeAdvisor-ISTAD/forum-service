@@ -2,6 +2,7 @@ package com.example.forumcodeadvisors.feature.question.mapper;
 
 import com.example.forumcodeadvisors.domain.Question;
 import com.example.forumcodeadvisors.domain.Tag;
+import com.example.forumcodeadvisors.domain.Vote;
 import com.example.forumcodeadvisors.feature.question.dto.CreateQuestionRequest;
 import com.example.forumcodeadvisors.feature.question.dto.QuestionResponse;
 import org.mapstruct.Mapper;

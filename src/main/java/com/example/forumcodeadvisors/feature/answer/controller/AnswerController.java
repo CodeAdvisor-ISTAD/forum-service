@@ -6,6 +6,7 @@ import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
 import com.example.forumcodeadvisors.feature.answer.service.AnswerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,10 @@ public class AnswerController {
     }
 
     @GetMapping("/{questionUuid}/question")
-    public List<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionUuid) {
-        return answerService.findAllQuestionByQuestionUuid(questionUuid);
+    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionUuid,
+                                                                    @RequestParam(defaultValue = "0") int page,
+                                                                    @RequestParam(defaultValue = "10") int size) {
+        return answerService.findAllQuestionByQuestionUuid(questionUuid, page, size);
     }
 
     @DeleteMapping("/{answerUuid}/soft-delete")

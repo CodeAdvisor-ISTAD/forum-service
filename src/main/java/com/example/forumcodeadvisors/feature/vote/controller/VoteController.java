@@ -1,6 +1,7 @@
 package com.example.forumcodeadvisors.feature.vote.controller;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
+import com.example.forumcodeadvisors.feature.vote.dto.TotalVoteResponse;
 import com.example.forumcodeadvisors.feature.vote.service.VoteService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +20,14 @@ public class VoteController {
     private final VoteService voteService;
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/question/{questionUuid}/user/{userUuid}")
-    public BaseResponse<?> voteQuestion(@PathVariable String questionUuid, @PathVariable String userUuid) {
+    @PostMapping("/question")
+    public BaseResponse<?> voteQuestion(@RequestParam String questionUuid,
+                                        @RequestParam String userUuid) {
         return voteService.voteQuestion(questionUuid, userUuid);
     }
 
-    @GetMapping("/{questionUuid}/total-votes")
-    public Integer totalQuestionVotes(@PathVariable  String questionUuid) {
+    @GetMapping("question/{questionUuid}/total-votes")
+    public TotalVoteResponse totalQuestionVotes(@PathVariable  String questionUuid) {
         return voteService.totalQuestionVotes(questionUuid);
     }
 }

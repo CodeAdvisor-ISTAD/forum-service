@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,18 +44,21 @@ public class QuestionServiceImpl implements QuestionService {
      */
     @Transactional
     @Override
-    public BaseResponse<?> createQuestion(CreateQuestionRequest createQuestionRequest) {
+    public BaseResponse<?> createQuestion(CreateQuestionRequest createQuestionRequest, Jwt jwt) {
+
+        String userUuid = jwt.getClaim("userUuid");
 
         // check if user is null
-        if (createQuestionRequest.authorUuid() == null) {
+        if (userUuid == null) {
             throw new ResponseStatusException(
                     BAD_REQUEST,
                     "Author UUID is required"
             );
         }
 
-        // find tags by tag id
-        List<Tag> existingTags = tagRepository.findAllById(createQuestionRequest.tagIds());
+        List<String> tags = createQuestionRequest.tagName();
+        // find tags by tag name
+        List<Tag> existingTags = tagRepository.findByNameIn(tags);
 
         // map request to question object
         Question question = questionMapper.fromCreateQuestionRequest(createQuestionRequest);
@@ -63,6 +67,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setTags(existingTags);
 
         // set UUID to question
+        question.setAuthorUuid(userUuid);
         question.setUuid(UUID.randomUUID().toString());
         question.setVote(List.of());
 
@@ -226,5 +231,28 @@ public class QuestionServiceImpl implements QuestionService {
                         HttpStatus.NOT_FOUND, "Question not found"));
 
         return questionMapper.toQuestionResponse(question);
+    }
+
+    @Override
+    public QuestionResponse findQuestionBySlug(String slug) {
+
+        Question question = questionRepository.findBySlugAndIsArchivedAndIsDeletedAndIsDrafted(slug, false, false, false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Question not found"));
+
+        return questionMapper.toQuestionResponse(question);
+    }
+
+    @Override
+    public Page<QuestionResponse> findAllOwnerQuestions(Jwt jwt, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        // get user UUID from JWT
+        String userUuid = jwt.getClaim("userUuid");
+
+        Page<Question> questions = questionRepository.findAllByAuthorUuidAndIsDeletedAndIsDrafted(userUuid, false, false, pageable);
+
+        return questions.map(questionMapper::toQuestionResponse);
     }
 }

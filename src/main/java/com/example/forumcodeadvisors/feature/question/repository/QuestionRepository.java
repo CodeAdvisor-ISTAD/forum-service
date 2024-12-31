@@ -14,9 +14,11 @@ public interface QuestionRepository extends JpaRepository<Question,Long> {
 
     Optional<Question> findByUuid(String uuid);
 
-    List<Question> findAllByIsArchivedAndIsDeletedAndIsDrafted(Boolean isArchived, Boolean isDeleted, Boolean isDrafted);
-
     Optional<Question> findByUuidAndIsArchivedAndIsDeletedAndIsDrafted(String uuid, Boolean isArchived, Boolean isDeleted, Boolean isDrafted);
 
     Page<Question> findAllByIsArchivedAndIsDeletedAndIsDrafted(Boolean isArchived, Boolean isDeleted, Boolean isDrafted, Pageable pageable);
+
+    Page<Question> findAllByAuthorUuidAndIsDeletedAndIsDrafted(String authorUuid, Boolean isDeleted, Boolean isDrafted, Pageable pageable);
+
+   Optional<Question> findBySlugAndIsArchivedAndIsDeletedAndIsDrafted(String slug, Boolean isArchived, Boolean isDeleted, Boolean isDrafted);
 }

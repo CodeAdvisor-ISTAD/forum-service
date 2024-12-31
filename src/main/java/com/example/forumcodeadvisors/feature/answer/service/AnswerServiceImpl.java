@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -148,14 +150,14 @@ public class AnswerServiceImpl implements AnswerService {
                         "Answer not found"
                 ));
 
-//        if(!answer.getAuthorUuid().equals(authorUuid)){
-//            if(!answer.getQuestion().getAuthorUuid().equals(authorUuid)){
-//                throw new ResponseStatusException(
-//                        HttpStatus.FORBIDDEN,
-//                        "You are not allowed to delete this answer"
-//                );
-//            }
-//        }
+        if(!answer.getAuthorUuid().equals(authorUuid)){
+            if(!answer.getQuestion().getAuthorUuid().equals(authorUuid)){
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "You are not allowed to delete this answer"
+                );
+            }
+        }
 
         answer.setIsDeleted(true);
         answerRepository.save(answer);
@@ -208,4 +210,5 @@ public class AnswerServiceImpl implements AnswerService {
                 .message("Answer accepted successfully")
                 .build();
     }
+
 }

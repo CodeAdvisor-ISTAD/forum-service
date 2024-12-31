@@ -1,18 +1,16 @@
 package com.example.forumcodeadvisors.feature.question.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
-import com.example.forumcodeadvisors.domain.Question;
 import com.example.forumcodeadvisors.feature.question.dto.CreateQuestionRequest;
 import com.example.forumcodeadvisors.feature.question.dto.QuestionResponse;
 import org.springframework.data.domain.Page;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public interface QuestionService {
 
-    BaseResponse<?> createQuestion(CreateQuestionRequest createForumRequest);
+    BaseResponse<?> createQuestion(CreateQuestionRequest createForumRequest, Jwt jwt);
 
     BaseResponse<?> publishQuestion(String questionUuid, String userUuid);
 
@@ -28,6 +26,7 @@ public interface QuestionService {
 
     QuestionResponse findQuestionByUuid(String questionUuid);
 
+    QuestionResponse findQuestionBySlug(String slug);
 
-
+    Page<QuestionResponse> findAllOwnerQuestions(Jwt jwt, int page, int size);
 }

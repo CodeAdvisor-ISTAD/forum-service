@@ -1,6 +1,11 @@
 spring:
   application:
     name: forum-code-advisors
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://127.0.0.1:9090
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://34.50.73.18:5430/postgres
@@ -10,3 +15,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: debug
+
+server:
+  port: 8081

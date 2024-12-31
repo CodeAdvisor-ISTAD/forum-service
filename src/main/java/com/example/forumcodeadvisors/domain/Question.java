@@ -26,16 +26,10 @@ public class Question extends Auditable {
     private String slug;
 
     @Column(columnDefinition = "TEXT")
-    private String content;
-
-    @Column(columnDefinition = "TEXT")
     private String introduction; // introduces the question
 
     @Column(columnDefinition = "TEXT")
     private String expectedAnswers; // concludes the question
-
-    @Column(columnDefinition = "TEXT")
-    private String description;
 
     private String authorUuid;
 

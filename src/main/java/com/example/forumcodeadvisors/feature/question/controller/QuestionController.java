@@ -6,23 +6,32 @@ import com.example.forumcodeadvisors.feature.question.dto.QuestionResponse;
 import com.example.forumcodeadvisors.feature.question.service.QuestionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/questions")
 @RequiredArgsConstructor
+@Slf4j
 public class QuestionController {
 
     private final QuestionService questionService;
 
+    @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public BaseResponse<?> createQuestion(@Valid @RequestBody CreateQuestionRequest createQuestionRequest) {
-        return questionService.createQuestion(createQuestionRequest);
+    public BaseResponse<?> createQuestion(@Valid @RequestBody CreateQuestionRequest createQuestionRequest, @AuthenticationPrincipal Jwt jwt) {
+//
+//        Object oauth2 = auth.getPrincipal();
+//        Jwt jwt = (Jwt) oauth2;
+//        log.info("JWT: {}", jwt.getClaimAsString("userUuid"));
+
+        return questionService.createQuestion(createQuestionRequest, jwt);
     }
 
     @PostMapping("/publish")
@@ -45,9 +54,11 @@ public class QuestionController {
         return questionService.unarchiveQuestion(questionUuid);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public Page<QuestionResponse> findAllQuestions(@RequestParam(defaultValue = "0") int page,
+    public Page<QuestionResponse> findAllQuestions(@AuthenticationPrincipal Jwt auth, @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "10") int size) {
+        System.out.println("JWT: " + auth.getTokenValue());
         return questionService.findAllQuestions(page, size);
     }
 
@@ -60,6 +71,19 @@ public class QuestionController {
     @GetMapping("/{questionUuid}")
     public QuestionResponse findQuestionByUuid(@PathVariable String questionUuid) {
         return questionService.findQuestionByUuid(questionUuid);
+    }
+
+    @GetMapping("/owner")
+    public Page<QuestionResponse> findAllOwnerQuestions(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "0") int page,
+                                                        @RequestParam(defaultValue = "10") int size) {
+
+        log.info("JWT: {}", jwt.getClaimAsString("userUuid"));
+        return questionService.findAllOwnerQuestions(jwt, page, size);
+    }
+
+    @GetMapping("/slug/{slug}")
+    public QuestionResponse findQuestionBySlug(@PathVariable String slug) {
+        return questionService.findQuestionBySlug(slug);
     }
 
 }

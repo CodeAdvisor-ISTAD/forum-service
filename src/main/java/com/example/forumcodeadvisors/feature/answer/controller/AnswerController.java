@@ -8,6 +8,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +42,7 @@ public class AnswerController {
 
     @DeleteMapping("/{answerUuid}/soft-delete")
     public BaseResponse<?> deleteAnswer(@PathVariable String answerUuid) {
-        return answerService.deleteAnswer(answerUuid, null);
+        return answerService.deleteAnswer(answerUuid, answerUuid);
     }
 
     @PutMapping("/{answerUuid}/{authorUuid}/accepted")

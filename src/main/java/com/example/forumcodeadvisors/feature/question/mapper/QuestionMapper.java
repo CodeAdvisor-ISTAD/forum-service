@@ -19,19 +19,19 @@ public interface QuestionMapper {
 
     List<QuestionResponse> toQuestionResponse(List<Question> questions);
 
-    @Mapping(source = "tagIds", target = "tags", qualifiedByName = "mapTagIds")
+    @Mapping(source = "tagName", target = "tags", qualifiedByName = "mapTagNames")
     Question fromCreateQuestionRequest(CreateQuestionRequest createForumRequest);
 
-    @Named("mapTagIds")
-    default List<Tag> mapTagIds(List<Long> tagIds) {
-        return tagIds.stream()
-                .map(this::mapTagId)
+    @Named("mapTagNames")
+    default List<Tag> mapTagNames(List<String> tagNames) {
+        return tagNames.stream()
+                .map(this::mapTagName)
                 .collect(Collectors.toList());
     }
 
-    default Tag mapTagId(Long id) {
+    default Tag mapTagName(String name) {
         Tag tag = new Tag();
-        tag.setId(id);
+        tag.setName(name);
         return tag;
     }
 

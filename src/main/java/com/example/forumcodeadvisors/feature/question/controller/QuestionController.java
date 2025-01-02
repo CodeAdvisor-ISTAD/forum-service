@@ -49,11 +49,10 @@ public class QuestionController {
         return questionService.unarchiveQuestion(questionUuid);
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public Page<QuestionResponse> findAllQuestions(@AuthenticationPrincipal Jwt auth, @RequestParam(defaultValue = "0") int page,
+    public Page<QuestionResponse> findAllQuestions( @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "10") int size) {
-        System.out.println("JWT: " + auth.getTokenValue());
+
         return questionService.findAllQuestions(page, size);
     }
 

@@ -10,4 +10,5 @@ import java.util.List;
 public interface TagService {
 
     List<TagResponse> findAllTags();
+
 }

@@ -17,7 +17,6 @@ public class tagController {
 
     private final TagService tagService;
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public List<TagResponse> findAllTags() {
         return tagService.findAllTags();

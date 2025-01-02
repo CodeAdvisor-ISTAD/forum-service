@@ -31,6 +31,8 @@ public class Question extends Auditable {
     @Column(columnDefinition = "TEXT")
     private String expectedAnswers; // concludes the question
 
+    private String description; // describes the question
+
     private String authorUuid;
 
     private Boolean isArchived = false;

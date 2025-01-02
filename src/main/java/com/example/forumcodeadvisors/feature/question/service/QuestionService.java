@@ -29,4 +29,6 @@ public interface QuestionService {
     QuestionResponse findQuestionBySlug(String slug);
 
     Page<QuestionResponse> findAllOwnerQuestions(Jwt jwt, int page, int size);
+
+
 }

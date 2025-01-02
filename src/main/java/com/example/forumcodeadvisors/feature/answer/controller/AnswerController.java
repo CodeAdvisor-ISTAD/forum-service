@@ -24,8 +24,9 @@ public class AnswerController {
 
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public BaseResponse<?> createAnswer(@Valid @RequestBody CreateAnswerRequest createAnswerRequest) {
-        return answerService.createAnswer(createAnswerRequest);
+    public BaseResponse<?> createAnswer(@Valid @RequestBody CreateAnswerRequest createAnswerRequest,
+                                        @AuthenticationPrincipal Jwt jwt) {
+        return answerService.createAnswer(createAnswerRequest, jwt);
     }
 
     @GetMapping("/{answerUuid}")

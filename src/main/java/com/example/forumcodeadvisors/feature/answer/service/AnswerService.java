@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface AnswerService {
 
-    BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest);
+    BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest, Jwt jwt);
 
     ParentAnswerResponse findAnswerByUuid(String answerUuid);
 

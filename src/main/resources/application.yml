@@ -1,25 +1,21 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: forum-code-advisors
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://127.0.0.1:9090
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://34.50.73.18:5430/postgres
-    username: admin
-    password: Code@Advisors2024
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  config:
+    import: "configserver:"
 
-logging:
-  level:
-    root: INFO
-    org.springframework.security: debug
+  cloud:
+    config:
+      uri: http://167.172.78.79:8888
 
-server:
-  port: 8081
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

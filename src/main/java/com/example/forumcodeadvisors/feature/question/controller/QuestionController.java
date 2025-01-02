@@ -26,11 +26,6 @@ public class QuestionController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public BaseResponse<?> createQuestion(@Valid @RequestBody CreateQuestionRequest createQuestionRequest, @AuthenticationPrincipal Jwt jwt) {
-//
-//        Object oauth2 = auth.getPrincipal();
-//        Jwt jwt = (Jwt) oauth2;
-//        log.info("JWT: {}", jwt.getClaimAsString("userUuid"));
-
         return questionService.createQuestion(createQuestionRequest, jwt);
     }
 

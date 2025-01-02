@@ -12,11 +12,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface AnswerMapper {
 
-    @Mapping(target = "authorUuid", source = "userUuid")
     @Mapping(target = "question.uuid", source = "questionUuid")
     Answer fromCreateAnswerRequest(CreateAnswerRequest createAnswerRequest);
 
-    @Mapping(target = "userUuid", source = "authorUuid")
     @Mapping(target = "questionUuid", source = "question.uuid")
     ParentAnswerResponse toParentAnswerResponse(Answer answer);
 
@@ -30,7 +28,6 @@ public interface AnswerMapper {
                 .toList();
     }
 
-    @Mapping(target = "userUuid", source = "authorUuid")
     @Mapping(target = "questionUuid", source = "question.uuid")
     default AnswerResponse answerToAnswerResponse(Answer answer) {
         if (answer == null || Boolean.TRUE.equals(answer.getIsDeleted())) {
@@ -39,7 +36,6 @@ public interface AnswerMapper {
         return mapNonDeletedAnswer(answer);
     }
 
-    @Mapping(target = "userUuid", source = "authorUuid")
     @Mapping(target = "questionUuid", source = "question.uuid")
     AnswerResponse mapNonDeletedAnswer(Answer answer);
 

@@ -37,7 +37,17 @@ public class AnswerServiceImpl implements AnswerService {
      * by Yith Sopheaktra
      */
     @Override
-    public BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest) {
+    public BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest, Jwt jwt) {
+
+        String userUuid = jwt.getClaim("userUuid");
+
+        // check if user is null
+        if (userUuid == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Author UUID is required"
+            );
+        }
 
         Question question = questionRepository.findByUuid(createAnswerRequest.questionUuid())
                 .orElseThrow(() -> new ResponseStatusException(
@@ -55,6 +65,7 @@ public class AnswerServiceImpl implements AnswerService {
             parentAnswer.setQuestion(question);
             parentAnswer.setReplies(List.of());
             parentAnswer.setIsParent(true);
+            parentAnswer.setAuthorUuid(userUuid);
             answerRepository.save(parentAnswer);
         } else { // if answerUuid is not null ( This mean this is a reply )
             // get the parent answer
@@ -70,6 +81,7 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setQuestion(question);
             answer.setIsParent(false);
             answer.setReplies(List.of());
+            answer.setAuthorUuid(userUuid);
 
             // get the replies of the parent answer
             List<Answer> answerList = parentAnswer.getReplies();

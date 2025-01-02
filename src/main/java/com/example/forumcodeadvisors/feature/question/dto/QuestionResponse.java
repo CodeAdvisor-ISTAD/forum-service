@@ -5,8 +5,6 @@ public record QuestionResponse(
         String authorUuid,
         String title,
         String description,
-        String content,
-        String introduction,
         String expectedAnswers,
         Boolean isDrafted,
         Boolean isArchived,

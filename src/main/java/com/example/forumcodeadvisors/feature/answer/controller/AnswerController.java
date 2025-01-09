@@ -1,6 +1,7 @@
 package com.example.forumcodeadvisors.feature.answer.controller;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
+import com.example.forumcodeadvisors.feature.answer.dto.AcceptAnswerRequest;
 import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
 import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
 import com.example.forumcodeadvisors.feature.answer.service.AnswerService;
@@ -34,11 +35,11 @@ public class AnswerController {
         return answerService.findAnswerByUuid(answerUuid);
     }
 
-    @GetMapping("/{questionUuid}/question")
-    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionUuid,
+    @GetMapping("/{questionSlug}/question")
+    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionSlug,
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size) {
-        return answerService.findAllQuestionByQuestionUuid(questionUuid, page, size);
+        return answerService.findAllQuestionByQuestionSlug(questionSlug, page, size);
     }
 
     @DeleteMapping("/{answerUuid}/soft-delete")
@@ -46,8 +47,13 @@ public class AnswerController {
         return answerService.deleteAnswer(answerUuid, answerUuid);
     }
 
-    @PutMapping("/{answerUuid}/{authorUuid}/accepted")
-    public BaseResponse<?> acceptAnswer(@PathVariable String answerUuid, @PathVariable String authorUuid) {
-        return answerService.acceptAnswer(answerUuid, authorUuid);
+    @PutMapping("/accepted")
+    public BaseResponse<?> acceptAnswer(@RequestBody AcceptAnswerRequest acceptAnswerRequest, @AuthenticationPrincipal Jwt jwt) {
+        return answerService.acceptAnswer(acceptAnswerRequest, jwt);
+    }
+
+    @PutMapping("/un-accepted")
+    public BaseResponse<?> unAcceptAnswer(@RequestBody AcceptAnswerRequest acceptAnswerRequest, @AuthenticationPrincipal Jwt jwt) {
+        return answerService.unAcceptAnswer(acceptAnswerRequest, jwt);
     }
 }

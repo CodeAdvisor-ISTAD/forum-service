@@ -4,9 +4,11 @@ import java.util.List;
 
 public record ParentAnswerResponse(
         String uuid,
-        String userUuid,
-        String questionUuid,
+        String authorUuid,
+        String questionSlug,
         String slug,
+        Boolean isParent,
+        Boolean isAccepted,
         String content,
         String createdAt,
         String updatedAt,

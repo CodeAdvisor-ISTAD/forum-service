@@ -2,23 +2,26 @@ package com.example.forumcodeadvisors.feature.vote.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
 import com.example.forumcodeadvisors.feature.vote.dto.TotalVoteResponse;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 public interface VoteService {
 
 
-    BaseResponse<?> voteQuestion(String questionUuid, String userUuid);
+    BaseResponse<?> voteQuestion(String slug, Jwt jwt);
 
-    TotalVoteResponse totalQuestionVotes(String questionUuid);
+    BaseResponse<?> downVoteQuestion(String slug, Jwt jwt);
+
+    TotalVoteResponse totalQuestionVotesUp(String slug);
+
+    TotalVoteResponse totalQuestionVotesDown(String slug);
 
     BaseResponse<?> voteAnswer(String answerUuid, String userUuid);
 
     TotalVoteResponse totalAnswerVotes(String answerUuid);
 
-    BaseResponse<?> downVoteQuestion(String questionUuid, String userUuid);
-
     BaseResponse<?> downVoteAnswer(String answerUuid, String userUuid);
 
-    BaseResponse<?> checkUserIsVotedOnQuestion(String questionUuid, String userUuid);
+    BaseResponse<?> checkUserIsVotedOnQuestion(String slug, Jwt jwt);
 
     BaseResponse<?> checkUserIsVotedOnAnswer(String answerUuid, String userUuid);
 }

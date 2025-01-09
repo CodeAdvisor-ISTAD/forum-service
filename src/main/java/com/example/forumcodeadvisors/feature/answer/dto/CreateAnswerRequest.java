@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 public record CreateAnswerRequest(
 
         @NotBlank
-        String questionUuid,
+        String questionSlug,
 
         String answerUuid,
 

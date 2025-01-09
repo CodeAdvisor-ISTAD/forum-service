@@ -80,4 +80,10 @@ public class QuestionController {
         return questionService.findQuestionBySlug(slug);
     }
 
+    @GetMapping("/tag/{tagName}")
+    public Page<QuestionResponse> findAllQuestionsByTagName(@PathVariable String tagName, @RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        return questionService.findAllQuestionsByTagName(tagName, page, size);
+    }
+
 }

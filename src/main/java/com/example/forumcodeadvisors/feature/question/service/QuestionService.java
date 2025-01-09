@@ -30,5 +30,6 @@ public interface QuestionService {
 
     Page<QuestionResponse> findAllOwnerQuestions(Jwt jwt, int page, int size);
 
+    Page<QuestionResponse> findAllQuestionsByTagName(String tagName, int page, int size);
 
 }

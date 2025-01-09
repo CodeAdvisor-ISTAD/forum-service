@@ -41,7 +41,7 @@ public class Answer extends Auditable {
     @ManyToOne
     private Question question;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> replies;
 
 }

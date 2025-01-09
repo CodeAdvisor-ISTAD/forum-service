@@ -14,7 +14,10 @@ public record CreateQuestionRequest(
         List<String> tagName,
         @NotBlank(message = "Introduction is required")
         String introduction,
+        @NotBlank(message = "Expected answer is required")
         String expectedAnswers,
+        @NotBlank(message = "Description is required")
+        String description,
         Boolean isDrafted
 ) {
 }

@@ -10,6 +10,7 @@ public record QuestionResponse(
         String authorUuid,
         String title,
         String description,
+        String introduction,
         String expectedAnswers,
         List<TagResponse> tags,
         Boolean isDrafted,

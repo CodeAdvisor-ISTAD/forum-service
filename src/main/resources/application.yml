@@ -3,12 +3,32 @@ spring:
     active: dev
   application:
     name: forum-service
+
   config:
     import: "configserver:"
 
   cloud:
     config:
       uri: http://167.172.78.79:8888
+
+  kafka:
+    bootstrap-servers:
+      - 167.172.78.79:29093
+      - 167.172.78.79:39093
+      - 167.172.78.79:49093
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.trusted.packages: "*"
+    security:
+      protocol: SSL
+    ssl:
+      trust-store-location: classpath:kafka.server.truststore.jks
+      trust-store-password: password123
+      key-store-location: classpath:kafka.server.keystore.jks
+      key-store-password: password123
+      key-password: password123
 
 
 eureka:

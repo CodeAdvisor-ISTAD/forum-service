@@ -1,17 +1,23 @@
 package com.example.forumcodeadvisors.feature.answer.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
+import com.example.forumcodeadvisors.config.kafka.event.ForumAnswerCreatedEvent;
 import com.example.forumcodeadvisors.domain.Answer;
 import com.example.forumcodeadvisors.domain.Question;
+import com.example.forumcodeadvisors.feature.answer.dto.AcceptAnswerRequest;
 import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
 import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
 import com.example.forumcodeadvisors.feature.answer.mapper.AnswerMapper;
 import com.example.forumcodeadvisors.feature.answer.repository.AnswerRepository;
 import com.example.forumcodeadvisors.feature.question.repository.QuestionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -27,6 +33,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
     private final AnswerMapper answerMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
 
 
     /**
@@ -36,6 +44,7 @@ public class AnswerServiceImpl implements AnswerService {
      * @return BaseResponse<?>
      * by Yith Sopheaktra
      */
+    @Transactional
     @Override
     public BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest, Jwt jwt) {
 
@@ -49,7 +58,7 @@ public class AnswerServiceImpl implements AnswerService {
             );
         }
 
-        Question question = questionRepository.findByUuid(createAnswerRequest.questionUuid())
+        Question question = questionRepository.findBySlugAndIsArchivedAndIsDeletedAndIsDrafted(createAnswerRequest.questionSlug(), false, false, false)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Question not found"
@@ -67,6 +76,13 @@ public class AnswerServiceImpl implements AnswerService {
             parentAnswer.setIsParent(true);
             parentAnswer.setAuthorUuid(userUuid);
             answerRepository.save(parentAnswer);
+            kafkaTemplate.send("forum-comment-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
+                            .answerOwnerUuid(parentAnswer.getAuthorUuid())
+                            .questionOwnerUuid(question.getAuthorUuid())
+                            .forumSlug(question.getSlug())
+                            .description(parentAnswer.getContent())
+                    .build());
+
         } else { // if answerUuid is not null ( This mean this is a reply )
             // get the parent answer
             parentAnswer = answerRepository.findByUuidAndIsDeleted(createAnswerRequest.answerUuid(), false)
@@ -128,12 +144,15 @@ public class AnswerServiceImpl implements AnswerService {
      * by Yith Sopheaktra
      */
     @Override
-    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(String questionUuid, int page, int size) {
+    public Page<ParentAnswerResponse> findAllQuestionByQuestionSlug(String questionSlug, int page, int size) {
 
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(
+                Sort.Order.desc("isAccepted"),  // Accepted answers first
+                Sort.Order.desc("createdAt")    // Then by creation date (newest first)
+        ));
 
         Page<Answer> answers = answerRepository.findAllByQuestionAndIsDeletedAndIsParent(
-                questionRepository.findByUuid(questionUuid).orElseThrow(() -> new ResponseStatusException(
+                questionRepository.findBySlugAndIsArchivedAndIsDeletedAndIsDrafted(questionSlug, false,false,false).orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Question not found"
                 )),
@@ -183,15 +202,16 @@ public class AnswerServiceImpl implements AnswerService {
     /**
      * Accept an answer
      *
-     * @param answerUuid
-     * @param authorUuid
+     * @param acceptAnswerRequest
      * @return BaseResponse<?>
      * by Yith Sopheaktra
      */
     @Override
-    public BaseResponse<?> acceptAnswer(String answerUuid, String authorUuid) {
+    public BaseResponse<?> acceptAnswer(AcceptAnswerRequest acceptAnswerRequest, Jwt jwt) {
 
-        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
+        String authorUuid = jwt.getClaim("userUuid");
+
+        Answer answer = answerRepository.findByUuidAndIsDeleted(acceptAnswerRequest.answerUuid(), false)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Answer not found"
@@ -216,9 +236,48 @@ public class AnswerServiceImpl implements AnswerService {
         }
 
         answer.setIsAccepted(true);
+        answerRepository.save(answer);
 
         return BaseResponse.builder()
-                .code(HttpStatus.NO_CONTENT.value())
+                .code(HttpStatus.OK.value())
+                .message("Answer accepted successfully")
+                .build();
+    }
+
+    @Override
+    public BaseResponse<?> unAcceptAnswer(AcceptAnswerRequest acceptAnswerRequest, Jwt jwt) {
+
+        String authorUuid = jwt.getClaim("userUuid");
+
+        Answer answer = answerRepository.findByUuidAndIsDeleted(acceptAnswerRequest.answerUuid(), false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Answer not found"
+                ));
+
+        Question question = answer.getQuestion();
+
+        // check if the author of the question is the same as the author of the answer
+        if(!question.getAuthorUuid().equals(authorUuid)){
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to accept this answer"
+            );
+        }
+
+        // check if the answer is already unaccepted
+        if(!answer.getIsAccepted()){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Answer is already accepted"
+            );
+        }
+
+        answer.setIsAccepted(false);
+        answerRepository.save(answer);
+
+        return BaseResponse.builder()
+                .code(HttpStatus.OK.value())
                 .message("Answer accepted successfully")
                 .build();
     }

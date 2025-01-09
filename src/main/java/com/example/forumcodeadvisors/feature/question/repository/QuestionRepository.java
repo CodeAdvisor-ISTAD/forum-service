@@ -1,6 +1,7 @@
 package com.example.forumcodeadvisors.feature.question.repository;
 
 import com.example.forumcodeadvisors.domain.Question;
+import com.example.forumcodeadvisors.domain.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,7 @@ public interface QuestionRepository extends JpaRepository<Question,Long> {
     Page<Question> findAllByAuthorUuidAndIsDeletedAndIsDrafted(String authorUuid, Boolean isDeleted, Boolean isDrafted, Pageable pageable);
 
    Optional<Question> findBySlugAndIsArchivedAndIsDeletedAndIsDrafted(String slug, Boolean isArchived, Boolean isDeleted, Boolean isDrafted);
+
+   Page<Question> findAllByTagsAndIsArchivedAndIsDeletedAndIsDrafted(List<Tag> tags, Boolean isArchived, Boolean isDeleted, Boolean isDrafted, Pageable pageable);
+
 }

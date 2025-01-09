@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,6 +34,8 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final QuestionRepository questionRepository;
     private final TagRepository tagRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
 
 
     /**
@@ -72,6 +75,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setVote(List.of());
 
         questionRepository.save(question);
+
 
         return BaseResponse.builder()
                 .code(HttpStatus.CREATED.value())
@@ -254,5 +258,20 @@ public class QuestionServiceImpl implements QuestionService {
         Page<Question> questions = questionRepository.findAllByAuthorUuidAndIsDeletedAndIsDrafted(userUuid, false, false, pageable);
 
         return questions.map(questionMapper::toQuestionResponse);
+    }
+
+    @Override
+    public Page<QuestionResponse> findAllQuestionsByTagName(String tagName, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Tag tag = tagRepository.findByName(tagName)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Tag not found"));
+
+        Page<Question> questions = questionRepository.findAllByTagsAndIsArchivedAndIsDeletedAndIsDrafted(List.of(tag), false, false, false, pageable);
+
+        return questions.map(questionMapper::toQuestionResponse);
+
     }
 }

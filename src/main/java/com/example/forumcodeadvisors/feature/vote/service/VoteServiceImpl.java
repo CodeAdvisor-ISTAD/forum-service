@@ -224,6 +224,49 @@ public class    VoteServiceImpl implements VoteService {
     }
 
     /**
+     * Check if user has voted on an answer
+     *
+     * @param answerUuid
+     * @param userUuid
+     * @return BaseResponse<?>
+     */
+    @Override
+    public BaseResponse<?> checkUserIsVotedOnAnswer(String answerUuid, String userUuid) {
+
+            Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
+                    .orElseThrow(() -> new ResponseStatusException(
+                            BAD_REQUEST,
+                            "Answer not found"
+                    ));
+
+            List<Vote> votes = answer.getVote();
+
+            for (Vote vote : votes) {
+                if (vote.getUserUuid().equals(userUuid)) {
+                    if (!vote.getIsUpvote()) {
+                        return BaseResponse
+                                .builder()
+                                .code(CONFLICT.value())
+                                .message("isVoted : " + false)
+                                .build();
+                    } else {
+                        return BaseResponse
+                                .builder()
+                                .code(HttpStatus.OK.value())
+                                .message("isVoted : " + true)
+                                .build();
+                    }
+                }
+            }
+
+            return BaseResponse
+                    .builder()
+                    .code(HttpStatus.NOT_FOUND.value())
+                    .message("User has not voted")
+                    .build();
+    }
+
+    /**
      * Vote for an answer
      *
      * @param answerUuid
@@ -292,7 +335,7 @@ public class    VoteServiceImpl implements VoteService {
      * @return TotalVoteResponse
      */
     @Override
-    public TotalVoteResponse totalAnswerVotes(String answerUuid) {
+    public TotalVoteResponse totalAnswerVotesUp(String answerUuid) {
         Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
                 .orElseThrow(() -> new ResponseStatusException(
                         BAD_REQUEST,
@@ -304,6 +347,22 @@ public class    VoteServiceImpl implements VoteService {
         return TotalVoteResponse
                 .builder()
                 .totalVotes(upVote.size())
+                .build();
+    }
+
+    @Override
+    public TotalVoteResponse totalAnswerVotesDown(String answerUuid) {
+        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        BAD_REQUEST,
+                        "Answer not found"
+                ));
+
+        List<Vote> downVote = voteRepository.findByAnswerAndIsUpvote(answer, false);
+
+        return TotalVoteResponse
+                .builder()
+                .totalVotes(downVote.size())
                 .build();
     }
 
@@ -348,41 +407,7 @@ public class    VoteServiceImpl implements VoteService {
     }
 
 
-    /**
-     * Check if user has voted on an answer
-     *
-     * @param answerUuid
-     * @param userUuid
-     * @return BaseResponse<?>
-     */
-    @Override
-    public BaseResponse<?> checkUserIsVotedOnAnswer(String answerUuid, String userUuid) {
-        Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
-                .orElseThrow(() -> new ResponseStatusException(
-                        BAD_REQUEST,
-                        "Answer not found"
-                ));
 
-        List<Vote> votes = answer.getVote();
-
-        for (Vote vote : votes) {
-            if (vote.getUserUuid().equals(userUuid)) {
-                if (vote.getIsUpvote()) {
-                    return BaseResponse
-                            .builder()
-                            .code(HttpStatus.OK.value())
-                            .message("User has already voted")
-                            .build();
-                }
-            }
-        }
-
-        return BaseResponse
-                .builder()
-                .code(HttpStatus.NOT_FOUND.value())
-                .message("User has not voted")
-                .build();
-    }
 
 
 }

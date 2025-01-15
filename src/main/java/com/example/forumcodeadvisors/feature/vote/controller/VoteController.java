@@ -53,6 +53,7 @@ public class VoteController {
         return voteService.checkUserIsVotedOnQuestion(slug, jwt);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/answers")
     public BaseResponse<?> voteAnswer(@RequestParam String answerUuid,
                                       @AuthenticationPrincipal Jwt jwt) {
@@ -60,6 +61,7 @@ public class VoteController {
         return voteService.voteAnswer(answerUuid, userUuid);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/answers/down-vote")
     public BaseResponse<?> downVoteAnswer(@RequestParam String answerUuid,
                                           @AuthenticationPrincipal Jwt jwt) {
@@ -67,9 +69,14 @@ public class VoteController {
         return voteService.downVoteAnswer(answerUuid, userUuid);
     }
 
-    @GetMapping("answers/{answerUuid}/total-votes")
-    public TotalVoteResponse totalAnswerVotes(@PathVariable String answerUuid) {
-        return voteService.totalAnswerVotes(answerUuid);
+    @GetMapping("answers/{answerUuid}/total-up-votes")
+    public TotalVoteResponse totalAnswerVotesUp(@PathVariable String answerUuid) {
+        return voteService.totalAnswerVotesUp(answerUuid);
+    }
+
+    @GetMapping("answers/{answerUuid}/total-down-votes")
+    public TotalVoteResponse totalAnswerVotesDown(@PathVariable String answerUuid) {
+        return voteService.totalAnswerVotesDown(answerUuid);
     }
 
     @GetMapping("/answers/check-vote")

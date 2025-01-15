@@ -11,4 +11,6 @@ public interface TagService {
 
     List<TagResponse> findAllTags();
 
+    List<TagResponse> findTagsByQuestionUuid(String questionUuid);
+
 }

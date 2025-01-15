@@ -151,7 +151,7 @@ public class AnswerServiceImpl implements AnswerService {
      * by Yith Sopheaktra
      */
     @Override
-    public Page<ParentAnswerResponse> findAllQuestionByQuestionSlug(String questionSlug, int page, int size) {
+    public Page<ParentAnswerResponse> findAllAnswerByQuestionSlug(String questionSlug, int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(
                 Sort.Order.desc("isAccepted"),  // Accepted answers first
@@ -174,7 +174,7 @@ public class AnswerServiceImpl implements AnswerService {
      * Delete an answer
      *
      * @param answerUuid
-     * @param authorUuid
+     * @param jwt (userJwt)
      * @return BaseResponse<?>
      * by Yith Sopheaktra
      * @problem The author of the question should be able to delete the answer of the question and also the author of the answer should be able to delete the answer

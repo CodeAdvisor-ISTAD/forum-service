@@ -17,7 +17,9 @@ public interface VoteService {
 
     BaseResponse<?> voteAnswer(String answerUuid, String userUuid);
 
-    TotalVoteResponse totalAnswerVotes(String answerUuid);
+    TotalVoteResponse totalAnswerVotesUp(String answerUuid);
+
+    TotalVoteResponse totalAnswerVotesDown(String answerUuid);
 
     BaseResponse<?> downVoteAnswer(String answerUuid, String userUuid);
 

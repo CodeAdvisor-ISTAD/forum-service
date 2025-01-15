@@ -14,7 +14,7 @@ public interface AnswerService {
 
     ParentAnswerResponse findAnswerByUuid(String answerUuid);
 
-    Page<ParentAnswerResponse> findAllQuestionByQuestionSlug(String questionSlug, int page, int size);
+    Page<ParentAnswerResponse> findAllAnswerByQuestionSlug(String questionSlug, int page, int size);
 
     BaseResponse<?> deleteAnswer(String answerUuid, Jwt jwt);
 

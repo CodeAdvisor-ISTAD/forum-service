@@ -34,10 +34,10 @@ public class AnswerController {
     }
 
     @GetMapping("/{questionSlug}/question")
-    public Page<ParentAnswerResponse> findAllQuestionByQuestionUuid(@PathVariable String questionSlug,
+    public Page<ParentAnswerResponse> findAllAnswerByQuestionSlug(@PathVariable String questionSlug,
                                                                     @RequestParam(defaultValue = "0") int page,
                                                                     @RequestParam(defaultValue = "10") int size) {
-        return answerService.findAllQuestionByQuestionSlug(questionSlug, page, size);
+        return answerService.findAllAnswerByQuestionSlug(questionSlug, page, size);
     }
 
     @DeleteMapping("/{answerUuid}/soft-delete")

@@ -25,7 +25,7 @@ import static org.springframework.http.HttpStatus.CONFLICT;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class VoteServiceImpl implements VoteService {
+public class    VoteServiceImpl implements VoteService {
 
     private final VoteRepository voteRepository;
     private final QuestionRepository questionRepository;
@@ -34,8 +34,8 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Vote for a question
      *
-     * @param questionUuid
-     * @param userUuid
+     * @param slug
+     * @param jwt
      * @return BaseResponse<?>
      */
     @Transactional
@@ -97,7 +97,7 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Get total votes for a question
      *
-     * @param questionUuid
+     * @param slug
      * @return TotalVoteResponse
      */
     @Override
@@ -138,8 +138,8 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Downvote a question
      *
-     * @param questionUuid
-     * @param userUuid
+     * @param slug
+     * @param jwt
      * @return BaseResponse<?>
      */
     @Override
@@ -179,8 +179,8 @@ public class VoteServiceImpl implements VoteService {
     /**
      * Check if user has voted on a question
      *
-     * @param questionUuid
-     * @param userUuid
+     * @param slug
+     * @param jwt
      * @return BaseResponse<?>
      */
     @Override

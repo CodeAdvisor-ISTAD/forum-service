@@ -36,6 +36,8 @@ public class Question extends Auditable {
 
     private String authorUuid;
 
+    private String authorUsername;
+
     private Boolean isArchived = false;
 
     private Boolean isDeleted = false;

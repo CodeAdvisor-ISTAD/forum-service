@@ -1,9 +1,7 @@
 package com.example.forumcodeadvisors.feature.answer.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
-import com.example.forumcodeadvisors.feature.answer.dto.AcceptAnswerRequest;
-import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
-import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
+import com.example.forumcodeadvisors.feature.answer.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -18,10 +16,14 @@ public interface AnswerService {
 
     Page<ParentAnswerResponse> findAllQuestionByQuestionSlug(String questionSlug, int page, int size);
 
-    BaseResponse<?> deleteAnswer(String answerUuid, String authorUuid);
+    BaseResponse<?> deleteAnswer(String answerUuid, Jwt jwt);
 
     BaseResponse<?> acceptAnswer(AcceptAnswerRequest acceptAnswerRequest, Jwt jwt);
 
     BaseResponse<?> unAcceptAnswer(AcceptAnswerRequest acceptAnswerRequest, Jwt jwt);
+
+    BaseResponse<?> updateAnswer(UpdateAnswerRequest updateAnswerRequest, Jwt jwt);
+
+    TotalAnswerResponse getTotalAnswerByQuestionSlug(String questionSlug);
 
 }

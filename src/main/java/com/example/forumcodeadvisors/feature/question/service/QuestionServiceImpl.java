@@ -1,6 +1,8 @@
 package com.example.forumcodeadvisors.feature.question.service;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
+import com.example.forumcodeadvisors.config.kafka.event.ForumAnswerCreatedEvent;
+import com.example.forumcodeadvisors.config.kafka.event.ForumCreatedEvent;
 import com.example.forumcodeadvisors.domain.Question;
 import com.example.forumcodeadvisors.domain.Tag;
 import com.example.forumcodeadvisors.feature.question.dto.CreateQuestionRequest;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
 
 
 @Service
@@ -50,12 +53,21 @@ public class QuestionServiceImpl implements QuestionService {
     public BaseResponse<?> createQuestion(CreateQuestionRequest createQuestionRequest, Jwt jwt) {
 
         String userUuid = jwt.getClaim("userUuid");
+        String userName = jwt.getClaim("username");
 
         // check if user is null
         if (userUuid == null) {
             throw new ResponseStatusException(
                     BAD_REQUEST,
                     "Author UUID is required"
+            );
+        }
+
+        // check if slug is exist
+        if(questionRepository.existsBySlug(createQuestionRequest.slug())){
+            throw new ResponseStatusException(
+                    CONFLICT,
+                    "Slug is already exist"
             );
         }
 
@@ -73,8 +85,19 @@ public class QuestionServiceImpl implements QuestionService {
         question.setAuthorUuid(userUuid);
         question.setUuid(UUID.randomUUID().toString());
         question.setVote(List.of());
+        question.setAuthorUsername(userName);
 
         questionRepository.save(question);
+
+        kafkaTemplate.send("forum-created-events-topic", question.getUuid(), ForumCreatedEvent.builder()
+                        .title(question.getTitle())
+                        .uuid(question.getUuid())
+                        .expectedAnswers(question.getExpectedAnswers())
+                        .introduction(question.getIntroduction())
+                        .description(question.getDescription())
+                        .authorUuid(question.getAuthorUuid())
+                        .slug(question.getSlug())
+                .build());
 
 
         return BaseResponse.builder()
@@ -273,5 +296,16 @@ public class QuestionServiceImpl implements QuestionService {
 
         return questions.map(questionMapper::toQuestionResponse);
 
+    }
+
+    @Override
+    public Page<QuestionResponse> findAllQuestionsByAuthurName(String authorName, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Question> questions = questionRepository.findAllByAuthorUsernameAndIsArchivedAndIsDeletedAndIsDrafted(authorName,false, false, false, pageable);
+
+
+        return questions.map(questionMapper::toQuestionResponse);
     }
 }

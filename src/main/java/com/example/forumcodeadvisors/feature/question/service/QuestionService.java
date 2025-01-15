@@ -32,4 +32,6 @@ public interface QuestionService {
 
     Page<QuestionResponse> findAllQuestionsByTagName(String tagName, int page, int size);
 
+    Page<QuestionResponse> findAllQuestionsByAuthurName(String authorName, int page, int size);
+
 }

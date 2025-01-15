@@ -25,4 +25,7 @@ public interface QuestionRepository extends JpaRepository<Question,Long> {
 
    Page<Question> findAllByTagsAndIsArchivedAndIsDeletedAndIsDrafted(List<Tag> tags, Boolean isArchived, Boolean isDeleted, Boolean isDrafted, Pageable pageable);
 
+    Page<Question> findAllByAuthorUsernameAndIsArchivedAndIsDeletedAndIsDrafted(String authorUsername, Boolean isDeleted, Boolean isDrafted, Boolean isArchived, Pageable pageable);
+
+   Boolean existsBySlug(String slug);
 }

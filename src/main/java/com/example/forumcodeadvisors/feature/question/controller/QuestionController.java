@@ -68,7 +68,8 @@ public class QuestionController {
     }
 
     @GetMapping("/owner")
-    public Page<QuestionResponse> findAllOwnerQuestions(@AuthenticationPrincipal Jwt jwt, @RequestParam(defaultValue = "0") int page,
+    public Page<QuestionResponse> findAllOwnerQuestions(@AuthenticationPrincipal Jwt jwt,
+                                                        @RequestParam(defaultValue = "0") int page,
                                                         @RequestParam(defaultValue = "10") int size) {
 
         log.info("JWT: {}", jwt.getClaimAsString("userUuid"));
@@ -84,6 +85,13 @@ public class QuestionController {
     public Page<QuestionResponse> findAllQuestionsByTagName(@PathVariable String tagName, @RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
         return questionService.findAllQuestionsByTagName(tagName, page, size);
+    }
+
+    @GetMapping("/author/{authorName}")
+    public Page<QuestionResponse> findAllQuestionsByAuthorName(@PathVariable String authorName,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "10") int size) {
+        return questionService.findAllQuestionsByAuthurName(authorName, page, size);
     }
 
 }

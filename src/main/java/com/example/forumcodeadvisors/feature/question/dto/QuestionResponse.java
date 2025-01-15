@@ -8,6 +8,7 @@ public record QuestionResponse(
         String uuid,
         String slug,
         String authorUuid,
+        String authorUsername,
         String title,
         String description,
         String introduction,
@@ -17,7 +18,7 @@ public record QuestionResponse(
         Boolean isArchived,
         Boolean isDeleted,
         String createdAt,
-        String updatedAt
+        String lastModifiedAt
 
 ) {
 }

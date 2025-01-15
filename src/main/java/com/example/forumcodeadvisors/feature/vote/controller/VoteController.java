@@ -55,13 +55,15 @@ public class VoteController {
 
     @PostMapping("/answers")
     public BaseResponse<?> voteAnswer(@RequestParam String answerUuid,
-                                      @RequestParam String userUuid) {
+                                      @AuthenticationPrincipal Jwt jwt) {
+        String userUuid = jwt.getClaimAsString("userUuid");
         return voteService.voteAnswer(answerUuid, userUuid);
     }
 
     @PostMapping("/answers/down-vote")
     public BaseResponse<?> downVoteAnswer(@RequestParam String answerUuid,
-                                          @RequestParam String userUuid) {
+                                          @AuthenticationPrincipal Jwt jwt) {
+        String userUuid = jwt.getClaimAsString("userUuid");
         return voteService.downVoteAnswer(answerUuid, userUuid);
     }
 
@@ -72,7 +74,8 @@ public class VoteController {
 
     @GetMapping("/answers/check-vote")
     public BaseResponse<?> checkUserIsVotedOnAnswer(@RequestParam String answerUuid,
-                                                   @RequestParam String userUuid) {
+                                                   @AuthenticationPrincipal Jwt jwt) {
+        String userUuid = jwt.getClaimAsString("userUuid");
         return voteService.checkUserIsVotedOnAnswer(answerUuid, userUuid);
     }
 }

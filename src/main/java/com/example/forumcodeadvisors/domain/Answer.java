@@ -27,6 +27,8 @@ public class Answer extends Auditable {
 
     private String authorUuid;
 
+    private String authorUsername;
+
     private Boolean isAccepted = false;
 
     private Boolean isDeleted = false;

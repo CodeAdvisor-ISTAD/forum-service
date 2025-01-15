@@ -4,9 +4,7 @@ import com.example.forumcodeadvisors.base.BaseResponse;
 import com.example.forumcodeadvisors.config.kafka.event.ForumAnswerCreatedEvent;
 import com.example.forumcodeadvisors.domain.Answer;
 import com.example.forumcodeadvisors.domain.Question;
-import com.example.forumcodeadvisors.feature.answer.dto.AcceptAnswerRequest;
-import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
-import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
+import com.example.forumcodeadvisors.feature.answer.dto.*;
 import com.example.forumcodeadvisors.feature.answer.mapper.AnswerMapper;
 import com.example.forumcodeadvisors.feature.answer.repository.AnswerRepository;
 import com.example.forumcodeadvisors.feature.question.repository.QuestionRepository;
@@ -49,6 +47,7 @@ public class AnswerServiceImpl implements AnswerService {
     public BaseResponse<?> createAnswer(CreateAnswerRequest createAnswerRequest, Jwt jwt) {
 
         String userUuid = jwt.getClaim("userUuid");
+        String userName = jwt.getClaim("username");
 
         // check if user is null
         if (userUuid == null) {
@@ -75,6 +74,7 @@ public class AnswerServiceImpl implements AnswerService {
             parentAnswer.setReplies(List.of());
             parentAnswer.setIsParent(true);
             parentAnswer.setAuthorUuid(userUuid);
+            parentAnswer.setAuthorUsername(userName);
             answerRepository.save(parentAnswer);
             kafkaTemplate.send("forum-comment-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
                             .answerOwnerUuid(parentAnswer.getAuthorUuid())
@@ -97,6 +97,7 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setQuestion(question);
             answer.setIsParent(false);
             answer.setReplies(List.of());
+            answer.setAuthorUsername(userName);
             answer.setAuthorUuid(userUuid);
 
             // get the replies of the parent answer
@@ -107,6 +108,12 @@ public class AnswerServiceImpl implements AnswerService {
             // set the replies to the parent answer
             parentAnswer.setReplies(answerList);
             answerRepository.save(parentAnswer);
+            kafkaTemplate.send("forum-reply-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
+                    .answerOwnerUuid(answer.getAuthorUuid())
+                    .questionOwnerUuid(question.getAuthorUuid())
+                    .forumSlug(question.getSlug())
+                    .description(answer.getContent())
+                    .build());
 
         }
 
@@ -173,7 +180,9 @@ public class AnswerServiceImpl implements AnswerService {
      * @problem The author of the question should be able to delete the answer of the question and also the author of the answer should be able to delete the answer
      */
     @Override
-    public BaseResponse<?> deleteAnswer(String answerUuid, String authorUuid) {
+    public BaseResponse<?> deleteAnswer(String answerUuid, Jwt jwt) {
+
+        String authorUuid = jwt.getClaim("userUuid");
 
         Answer answer = answerRepository.findByUuidAndIsDeleted(answerUuid, false)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -280,6 +289,42 @@ public class AnswerServiceImpl implements AnswerService {
                 .code(HttpStatus.OK.value())
                 .message("Answer accepted successfully")
                 .build();
+    }
+
+    @Override
+    public BaseResponse<?> updateAnswer(UpdateAnswerRequest updateAnswerRequest, Jwt jwt) {
+
+        String authorUuid = jwt.getClaim("userUuid");
+
+        Answer answer = answerRepository.findByUuidAndIsDeleted(updateAnswerRequest.answerUuid(), false)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Answer not found"
+                ));
+
+        if(!answer.getAuthorUuid().equals(authorUuid)){
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "You are not allowed to update this answer"
+            );
+        }
+
+        answer.setContent(updateAnswerRequest.content());
+        answerRepository.save(answer);
+
+        return BaseResponse.builder()
+                .code(HttpStatus.OK.value())
+                .message("Answer updated successfully")
+                .build();
+
+    }
+
+    @Override
+    public TotalAnswerResponse getTotalAnswerByQuestionSlug(String questionSlug) {
+
+        Long totalAnswer = answerRepository.countByQuestionSlugAndIsDeleted(questionSlug, false);
+
+        return new TotalAnswerResponse(totalAnswer);
     }
 
 }

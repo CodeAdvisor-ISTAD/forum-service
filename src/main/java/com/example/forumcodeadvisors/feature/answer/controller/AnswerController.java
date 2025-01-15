@@ -1,9 +1,7 @@
 package com.example.forumcodeadvisors.feature.answer.controller;
 
 import com.example.forumcodeadvisors.base.BaseResponse;
-import com.example.forumcodeadvisors.feature.answer.dto.AcceptAnswerRequest;
-import com.example.forumcodeadvisors.feature.answer.dto.ParentAnswerResponse;
-import com.example.forumcodeadvisors.feature.answer.dto.CreateAnswerRequest;
+import com.example.forumcodeadvisors.feature.answer.dto.*;
 import com.example.forumcodeadvisors.feature.answer.service.AnswerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +41,8 @@ public class AnswerController {
     }
 
     @DeleteMapping("/{answerUuid}/soft-delete")
-    public BaseResponse<?> deleteAnswer(@PathVariable String answerUuid) {
-        return answerService.deleteAnswer(answerUuid, answerUuid);
+    public BaseResponse<?> deleteAnswer(@PathVariable String answerUuid, @AuthenticationPrincipal Jwt jwt) {
+        return answerService.deleteAnswer(answerUuid, jwt);
     }
 
     @PutMapping("/accepted")
@@ -55,5 +53,15 @@ public class AnswerController {
     @PutMapping("/un-accepted")
     public BaseResponse<?> unAcceptAnswer(@RequestBody AcceptAnswerRequest acceptAnswerRequest, @AuthenticationPrincipal Jwt jwt) {
         return answerService.unAcceptAnswer(acceptAnswerRequest, jwt);
+    }
+
+    @PutMapping
+    public BaseResponse<?> updateAnswer(@RequestBody UpdateAnswerRequest updateAnswerRequest, @AuthenticationPrincipal Jwt jwt) {
+        return answerService.updateAnswer(updateAnswerRequest, jwt);
+    }
+
+    @GetMapping("/{questionSlug}/total")
+    public TotalAnswerResponse getTotalAnswerByQuestionSlug(@PathVariable String questionSlug) {
+        return answerService.getTotalAnswerByQuestionSlug(questionSlug);
     }
 }

@@ -76,12 +76,15 @@ public class AnswerServiceImpl implements AnswerService {
             parentAnswer.setAuthorUuid(userUuid);
             parentAnswer.setAuthorUsername(userName);
             answerRepository.save(parentAnswer);
-            kafkaTemplate.send("forum-comment-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
-                            .answerOwnerUuid(parentAnswer.getAuthorUuid())
-                            .questionOwnerUuid(question.getAuthorUuid())
-                            .forumSlug(question.getSlug())
-                            .description(parentAnswer.getContent())
-                    .build());
+
+            if(!userUuid.equals(question.getAuthorUuid())){
+                kafkaTemplate.send("forum-answer-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
+                        .answerOwnerUuid(parentAnswer.getAuthorUuid())
+                        .questionOwnerUuid(question.getAuthorUuid())
+                        .forumSlug(question.getSlug())
+                        .description(parentAnswer.getContent())
+                        .build());
+            }
 
         } else { // if answerUuid is not null ( This mean this is a reply )
             // get the parent answer
@@ -108,12 +111,14 @@ public class AnswerServiceImpl implements AnswerService {
             // set the replies to the parent answer
             parentAnswer.setReplies(answerList);
             answerRepository.save(parentAnswer);
-            kafkaTemplate.send("forum-reply-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
-                    .answerOwnerUuid(answer.getAuthorUuid())
-                    .questionOwnerUuid(question.getAuthorUuid())
-                    .forumSlug(question.getSlug())
-                    .description(answer.getContent())
-                    .build());
+            if(!parentAnswer.getAuthorUuid().equals(userUuid)){
+                kafkaTemplate.send("forum-reply-created-events-topic", parentAnswer.getUuid(), ForumAnswerCreatedEvent.builder()
+                        .answerOwnerUuid(parentAnswer.getAuthorUuid())
+                        .questionOwnerUuid(question.getAuthorUuid())
+                        .forumSlug(question.getSlug())
+                        .description(answer.getContent())
+                        .build());
+            }
 
         }
 

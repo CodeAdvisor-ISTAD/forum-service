@@ -22,6 +22,13 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/hello")
+    String hello() {
+        return "Hello";
+    }
+
     @PreAuthorize("isAuthenticated()")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping

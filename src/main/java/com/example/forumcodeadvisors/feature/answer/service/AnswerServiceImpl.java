@@ -332,4 +332,10 @@ public class AnswerServiceImpl implements AnswerService {
         return new TotalAnswerResponse(totalAnswer);
     }
 
+    @Override
+    public TotalAnswerResponse getTotalAnswer() {
+        Long totalAnswer = answerRepository.count();
+        return new TotalAnswerResponse(totalAnswer);
+    }
+
 }

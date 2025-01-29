@@ -26,4 +26,6 @@ public interface AnswerService {
 
     TotalAnswerResponse getTotalAnswerByQuestionSlug(String questionSlug);
 
+    TotalAnswerResponse getTotalAnswer();
+
 }

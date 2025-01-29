@@ -64,4 +64,9 @@ public class AnswerController {
     public TotalAnswerResponse getTotalAnswerByQuestionSlug(@PathVariable String questionSlug) {
         return answerService.getTotalAnswerByQuestionSlug(questionSlug);
     }
+
+    @GetMapping("/total")
+    public TotalAnswerResponse getTotalAnswer() {
+        return answerService.getTotalAnswer();
+    }
 }

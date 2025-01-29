@@ -34,4 +34,6 @@ public interface QuestionService {
 
     Page<QuestionResponse> findAllQuestionsByAuthurName(String authorName, int page, int size);
 
+
+
 }

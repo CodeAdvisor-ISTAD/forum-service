@@ -14,6 +14,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/questions")
 @RequiredArgsConstructor
@@ -25,8 +27,10 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/hello")
-    String hello() {
-        return "Hello";
+    Map<String, Object> hello() {
+        log.info("JWT TEST");
+        //log.info("JWT: {}", jwt);
+        return Map.of("message", "Hello, ");
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-//    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-//    private String issuerUri;
+    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
+    private String issuerUri;
 
     @Bean
     SecurityFilterChain configureFilterChain(HttpSecurity http) throws Exception {
@@ -66,9 +66,9 @@ public class SecurityConfig {
 //        return jwtAuthenticationConverter;
 //    }
 //
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        return JwtDecoders.fromIssuerLocation(issuerUri);
-//    }
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return JwtDecoders.fromIssuerLocation(issuerUri);
+    }
 
 }

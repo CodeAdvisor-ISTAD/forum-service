@@ -27,7 +27,8 @@ public class QuestionController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/hello")
-    Map<String, Object> hello() {
+    Map<String, Object> hello(@AuthenticationPrincipal Jwt jwt) {
+        log.info("JWT: {}", jwt.getClaimAsString("userUuid"));
         log.info("JWT TEST");
         //log.info("JWT: {}", jwt);
         return Map.of("message", "Hello, ");
